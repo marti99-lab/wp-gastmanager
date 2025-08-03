@@ -21,3 +21,9 @@ require_once WPGM_PATH . 'includes/class-cpt-aufgabe.php';
 
 // Aktionen registrieren
 add_action('init', ['WPGM_CPT_Aufgabe', 'register_aufgabe_post_type']);
+
+// Hook für Metaboxen
+add_action('add_meta_boxes', [__CLASS__, 'add_metaboxen']);
+
+// Hook für Speichern
+add_action('save_post', [__CLASS__, 'save_metaboxen']);

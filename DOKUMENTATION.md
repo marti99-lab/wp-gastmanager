@@ -4,7 +4,7 @@
 
 ## Projektziel
 
-Ein WordPress-Plugin zur Verwaltung von Aufgaben im Hotel- und Gastgewerbe.  
+Ein WordPress-Plugin zur Verwaltung von Aufgaben im Hotel- und Gastgewerbe.
 Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfache Übersicht zu schaffen.
 
 ---
@@ -17,7 +17,7 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Konstante `WPGM_PATH` definiert
 - Klasse `WPGM_CPT_Aufgabe` eingebunden
 
-### 2. Custom Post Type „Aufgabe“
+### 2. Custom Post Type (CPT) „Aufgabe“
 - Datei: `includes/class-cpt-aufgabe.php`
 - Registriert CPT `aufgabe` mit Unterstützung für:
   - Titel
@@ -26,11 +26,15 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Anzeige im WP-Menü mit Dashicon „clipboard“
 - Gutenberg-kompatibel (`show_in_rest`)
 
+### 3. Metaboxen für den Custom Post Type Aufgabe:
+- Zimmernummer (Textfeld)
+- Fälligkeitsdatum (Datumsauswahl)
+- Verantwortliche Person (Benutzerauswahl)
+
 ---
 
 ## Geplant als nächstes
 
-- Metaboxen: Zimmernummer, Fälligkeitsdatum, Verantwortliche Person
 - Shortcode für Frontend-Ansicht der Aufgabenliste
 - Nutzerrollen & Rechte (z. B. nur eigene Aufgaben sehen)
 - REST-API-Endpunkt für externe Nutzung
