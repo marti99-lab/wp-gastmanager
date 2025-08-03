@@ -34,8 +34,8 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Shortcode für Frontend-Ansicht der Aufgabenliste
 - Nutzerrollen & Rechte (z. B. nur eigene Aufgaben sehen)
 - REST-API-Endpunkt für externe Nutzung
-- CSV-Export
-- Fortschrittsanzeige für Aufgaben pro Zimmer
+- CSV-Export für Tagesplanung
+- Fortschrittsanzeige pro Projekt / Zimmer
 
 ---
 
@@ -43,6 +43,6 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 
 - Alle Funktionen sind gekapselt in Klassen
 - Textdomain `wp-gastmanager` wird konsistent verwendet
-- Multilingualität: Alle Texte mit () oder esc_html()
-- WordPress Coding Standards einhalten
-- Modularität und Wartbarkeit sicherstellen
+- Alle Texte werden korrekt internationalisiert (`__()` / `esc_html__()`)
+- WordPress Coding Standards werden eingehalten
+- Erweiterbarkeit und Wartbarkeit sind Ziel bei der Strukturierung
