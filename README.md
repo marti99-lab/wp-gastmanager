@@ -12,14 +12,15 @@ wp-gastmanager/
 ├── README.md                 // Für die Nutzer (Installation, Anwendung)
 ├── DOKUMENTATION.md          // Für die Entwicklung & technische Dokumentation
 ├── LICENSE                   // GPL 2.0 Lizenz
-├── includes/
+├── includes/class-roles.php
+│   ├── class-roles.php
 │   └── class-cpt-aufgabe.php // Custom Post Type "Aufgabe"
 ├── languages/
 │   ├── wp-gastmanager.pot         // Text-Template
 │   ├── wp-gastmanager-en_GB.po    // Englisch-Übersetzung
 │   ├── wp-gastmanager-en_GB.mo    // Kompilierte Version (maschinell lesbar)
 │   ├── wp-gastmanager-fr_FR.po
-│   ├── wp-gastmanager-fr_FR.mo
+│   └── wp-gastmanager-fr_FR.mo
 ```
 
 

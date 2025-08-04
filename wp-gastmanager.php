@@ -18,6 +18,7 @@ define('WPGM_PATH', plugin_dir_path(__FILE__));
 
 // Klassen einbinden
 require_once WPGM_PATH . 'includes/class-cpt-aufgabe.php';
+require_once WPGM_PATH . 'includes/class-roles.php';
 
 // Aktionen registrieren
 add_action('init', ['WPGM_CPT_Aufgabe', 'register_aufgabe_post_type']);

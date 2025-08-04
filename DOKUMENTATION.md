@@ -50,15 +50,37 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - `.mo`-Dateien sind die kompilierte Form, die WordPress tatsächlich verwendet
 - `.pot`-Datei (`wp-gastmanager.pot`) dient als Vorlage für neue Übersetzungen
 
----
+### 5. Shortcode für die Frontend-Ansicht der Aufgabenliste
+
+- Ein Shortcode `[wpgm_aufgabenliste]`, der im Frontend Aufgaben als Liste anzeigt
+#### Optionales Attribut `show`:
+| Attribut         | Beschreibung                           | Hinweis                                         |
+|------------------|----------------------------------------|-------------------------------------------------|
+| *(kein Attribut)*| Automatisches Verhalten je nach Rolle  | Standardfall                                    |
+| `show="own"`     | Zeigt nur eigene Aufgaben              | Für alle Benutzer verfügbar                     |
+| `show="all"`     | Zeigt alle Aufgaben                    | Nur sichtbar für bestimmte Rollen (z. B. Admin) |
+
+- `show="all"` wird nur berücksichtigt, wenn der Benutzer zu einer **autorisierten Rolle** gehört. Ansonsten wird automatisch auf `own` zurückgefallen.
+- Rollenbasierte Sichtbarkeit:
+  - Rollen wie `administrator`, `editor`, `manager` sehen alle Aufgaben
+  - Andere Benutzer (z. B. `mitarbeiter`, `autor`) sehen nur eigene Aufgaben
+- Übersetzbare Ausgabe der Aufgabenliste
+- HTML-Ausgabe als einfache Liste mit Titel, Zimmernummer, Fälligkeitsdatum, Verantwortlichem
+
+### 6. Benutzerrollen (Basis)
+
+- Vorbereitete Rollen: `mitarbeiter`, `hausdame`, `technik`
+- Registrierung erfolgt z. B. beim Plugin-Setup (zukünftig integrierbar)
+- Zuweisung über WP-Backend (Benutzer > Bearbeiten)
+- Keine speziellen Capabilities erforderlich (vereinfachte Rechtevergabe)
+- Erweiterbar für spätere Differenzierung nach Zugriffsrechten
 
 ## Geplant als nächstes
 
-- Shortcode für Frontend-Ansicht der Aufgabenliste
-- Nutzerrollen & Rechte (z. B. nur eigene Aufgaben sehen)
 - REST-API-Endpunkt für externe Nutzung
-- CSV-Export für Tagesplanung
+- CSV-Export der Aufgabenliste - für Tagesplanung
 - Fortschrittsanzeige pro Projekt / Zimmer
+- Anderes (z. B. UI-Verbesserung, Filter, Benutzerübersicht …)
 
 ---
 

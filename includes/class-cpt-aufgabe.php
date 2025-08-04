@@ -66,19 +66,22 @@ class WPGM_CPT_Aufgabe
     }
 
     // Metaboxen anzeigen in HTML
-    public static function render_zimmernummer_metabox($post) {
+    public static function render_zimmernummer_metabox($post)
+    {
         $value = get_post_meta($post->ID, '_wpgm_zimmernummer', true);
         echo '<label for="wpgm_zimmernummer">' . esc_html__('Zimmernummer:', 'wp-gastmanager') . '</label><br>';
         echo '<input type="text" id="wpgm_zimmernummer" name="wpgm_zimmernummer" value="' . esc_attr($value) . '" />';
     }
 
-    public static function render_faelligkeit_metabox($post) {
+    public static function render_faelligkeit_metabox($post)
+    {
         $value = get_post_meta($post->ID, '_wpgm_faelligkeit', true);
         echo '<label for="wpgm_faelligkeit">' . esc_html__('Fällig bis:', 'wp-gastmanager') . '</label><br>';
         echo '<input type="date" id="wpgm_faelligkeit" name="wpgm_faelligkeit" value="' . esc_attr($value) . '" />';
     }
 
-    public static function render_verantwortlich_metabox($post) {
+    public static function render_verantwortlich_metabox($post)
+    {
         $value = get_post_meta($post->ID, '_wpgm_verantwortlich', true);
         $users = get_users(['role__in' => ['author', 'editor', 'administrator']]);
 
@@ -93,7 +96,8 @@ class WPGM_CPT_Aufgabe
     }
 
     // Metadaten speichern
-    public static function save_metaboxen($post_id) {
+    public static function save_metaboxen($post_id)
+    {
         if (get_post_type($post_id) !== 'aufgabe') return;
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
 
@@ -108,5 +112,71 @@ class WPGM_CPT_Aufgabe
         if (isset($_POST['wpgm_verantwortlich'])) {
             update_post_meta($post_id, '_wpgm_verantwortlich', intval($_POST['wpgm_verantwortlich']));
         }
+    }
+
+    // Shortcode registrieren
+    public static function register_shortcode()
+    {
+        add_shortcode('wpgm_aufgabenliste', [__CLASS__, 'render_aufgabenliste']);
+    }
+
+    // Callback für den Shortcode
+    public static function render_aufgabenliste($atts)
+    {
+        $current_user = wp_get_current_user();
+        $allowed_roles = ['administrator', 'editor', 'manager'];
+        $show_all = array_intersect($current_user->roles, $allowed_roles);
+
+        $atts = shortcode_atts([
+            'orderby' => 'meta_value',
+            'order'   => 'ASC',
+            'show'    => 'own'
+        ], $atts);
+
+        $wants_all = $atts['show'] === 'all' && !empty($show_all);
+
+        $args = [
+            'post_type'      => 'aufgabe',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'meta_key'       => $atts['orderby'] === 'meta_value' ? '_wpgm_faelligkeit' : '',
+            'orderby'        => $atts['orderby'],
+            'order'          => $atts['order'],
+        ];
+
+        if (!$wants_all) {
+            $args['meta_query'] = [
+                [
+                    'key'     => '_wpgm_verantwortlich',
+                    'value'   => get_current_user_id(),
+                    'compare' => '=',
+                ]
+            ];
+        }
+
+        $query = new WP_Query($args);
+        if (!$query->have_posts()) {
+            return '<p>' . esc_html__('Keine Aufgaben vorhanden.', 'wp-gastmanager') . '</p>';
+        }
+
+        ob_start();
+        echo '<ul class="wpgm-aufgabenliste">';
+        while ($query->have_posts()) {
+            $query->the_post();
+            $faellig = get_post_meta(get_the_ID(), '_wpgm_faelligkeit', true);
+            $zimmer = get_post_meta(get_the_ID(), '_wpgm_zimmernummer', true);
+            $verantwortlich = get_post_meta(get_the_ID(), '_wpgm_verantwortlich', true);
+            $user = $verantwortlich ? get_userdata($verantwortlich) : null;
+
+            echo '<li>';
+            echo '<strong>' . esc_html(get_the_title()) . '</strong><br>';
+            echo esc_html__('Zimmer', 'wp-gastmanager') . ': ' . esc_html($zimmer) . '<br>';
+            echo esc_html__('Fällig bis', 'wp-gastmanager') . ': ' . esc_html($faellig) . '<br>';
+            echo esc_html__('Verantwortlich', 'wp-gastmanager') . ': ' . ($user ? esc_html($user->display_name) : '–') . '<br>';
+            echo '</li>';
+        }
+        echo '</ul>';
+        wp_reset_postdata();
+        return ob_get_clean();
     }
 }
