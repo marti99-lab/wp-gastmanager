@@ -1,0 +1,50 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Gastmanager\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr_FR\n"
+
+msgid "Aufgaben"
+msgstr "Tâches"
+
+msgid "Aufgabe"
+msgstr "Tâche"
+
+msgid "Neue Aufgabe"
+msgstr "Nouvelle tâche"
+
+msgid "Neue Aufgabe hinzufügen"
+msgstr "Ajouter une nouvelle tâche"
+
+msgid "Aufgabe bearbeiten"
+msgstr "Modifier la tâche"
+
+msgid "Aufgabe ansehen"
+msgstr "Voir la tâche"
+
+msgid "Aufgaben durchsuchen"
+msgstr "Rechercher des tâches"
+
+msgid "Keine Aufgaben gefunden"
+msgstr "Aucune tâche trouvée"
+
+msgid "Zimmernummer"
+msgstr "Numéro de chambre"
+
+msgid "Zimmernummer:"
+msgstr "Numéro de chambre :"
+
+msgid "Fälligkeitsdatum"
+msgstr "Date d’échéance"
+
+msgid "Fällig bis:"
+msgstr "À remettre avant :"
+
+msgid "Verantwortliche Person"
+msgstr "Personne responsable"
+
+msgid "Verantwortlich:"
+msgstr "Responsable :"
+
+msgid "– auswählen –"
+msgstr "– choisir –"

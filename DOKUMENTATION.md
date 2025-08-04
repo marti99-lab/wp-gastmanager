@@ -31,6 +31,25 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Fälligkeitsdatum (Datumsauswahl)
 - Verantwortliche Person (Benutzerauswahl)
 
+### 4. Mehrsprachigkeit (Internationalisierung)
+
+- Plugin ist vorbereitet für Internationalisierung (i18n)
+- Textdomain: `wp-gastmanager`
+- Alle statischen Texte mit `__()` bzw. `esc_html__()` übersetzbar gemacht
+- Übersetzungsdateien befinden sich im Ordner `/languages/`
+
+#### Unterstützte Sprachen:
+
+| Sprache            | Locale   | Dateien                                 |
+|--------------------|----------|------------------------------------------|
+| Deutsch (Standard) | `de_DE`  | Kein `.po/.mo` nötig – Originaltexte in Deutsch |
+| Englisch (UK)      | `en_GB`  | `wp-gastmanager-en_GB.po`, `wp-gastmanager-en_GB.mo` |
+| Französisch        | `fr_FR`  | `wp-gastmanager-fr_FR.po`, `wp-gastmanager-fr_FR.mo` |
+
+- `.po`-Dateien enthalten die editierbaren Übersetzungen (Textformat)
+- `.mo`-Dateien sind die kompilierte Form, die WordPress tatsächlich verwendet
+- `.pot`-Datei (`wp-gastmanager.pot`) dient als Vorlage für neue Übersetzungen
+
 ---
 
 ## Geplant als nächstes

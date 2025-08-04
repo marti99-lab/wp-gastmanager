@@ -3,6 +3,7 @@
 
 defined('ABSPATH') || exit;
 
+// WP-Gastmanager Custom Post Type Aufgabe (To-do)
 class WPGM_CPT_Aufgabe
 {
     // Registriert den Custom Post Type „aufgabe“ für Aufgabenverwaltung

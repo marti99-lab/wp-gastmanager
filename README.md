@@ -14,5 +14,12 @@ wp-gastmanager/
 ├── LICENSE                   // GPL 2.0 Lizenz
 ├── includes/
 │   └── class-cpt-aufgabe.php // Custom Post Type "Aufgabe"
-
+├── languages/
+│   ├── wp-gastmanager.pot         // Text-Template
+│   ├── wp-gastmanager-en_GB.po    // Englisch-Übersetzung
+│   ├── wp-gastmanager-en_GB.mo    // Kompilierte Version (maschinell lesbar)
+│   ├── wp-gastmanager-fr_FR.po
+│   ├── wp-gastmanager-fr_FR.mo
 ```
+
+
