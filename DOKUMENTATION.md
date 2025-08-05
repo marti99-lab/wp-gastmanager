@@ -75,9 +75,21 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Keine speziellen Capabilities erforderlich (vereinfachte Rechtevergabe)
 - Erweiterbar für spätere Differenzierung nach Zugriffsrechten
 
+### 7. Benutzerrollen bei Aktivierung / Deaktivierung
+
+- Bei Plugin-Aktivierung: Registrierung der Rollen mitarbeiter, hausdame, technik
+  (via register_activation_hook() und Klasse WPGM_Role_Manager)
+- Bei Plugin-Deaktivierung: Entfernen der Rollen
+  (via register_deactivation_hook())
+
+### 8. REST-API-Endpunkt für externe Nutzung
+
+- Route: /wp-json/wp-gastmanager/v1/aufgaben (REST-API-Endpunkt der bereitgestellt wird.)
+- Gibt Aufgaben als JSON zurück – mit rollenbasierter Sichtbarkeit
+- Nur für eingeloggte Nutzer zugänglich (z. B. für externe Tools oder Apps)
+
 ## Geplant als nächstes
 
-- REST-API-Endpunkt für externe Nutzung
 - CSV-Export der Aufgabenliste - für Tagesplanung
 - Fortschrittsanzeige pro Projekt / Zimmer
 - Anderes (z. B. UI-Verbesserung, Filter, Benutzerübersicht …)

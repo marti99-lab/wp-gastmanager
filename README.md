@@ -14,6 +14,7 @@ wp-gastmanager/
 ├── LICENSE                   // GPL 2.0 Lizenz
 ├── includes/class-roles.php
 │   ├── class-roles.php
+│   ├── class-rest-api.php
 │   └── class-cpt-aufgabe.php // Custom Post Type "Aufgabe"
 ├── languages/
 │   ├── wp-gastmanager.pot         // Text-Template
