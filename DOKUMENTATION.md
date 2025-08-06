@@ -88,9 +88,12 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Gibt Aufgaben als JSON zurück – mit rollenbasierter Sichtbarkeit
 - Nur für eingeloggte Nutzer zugänglich (z. B. für externe Tools oder Apps)
 
-## Geplant als nächstes
+### 9. CSV-Export der Aufgabenliste
 
-- CSV-Export der Aufgabenliste - für Tagesplanung
+- Exportiert Aufgaben (ID, Titel, Zimmer, Fälligkeit, Verantwortlicher) als CSV-Datei
+- Backend-Seite nur für berechtigte Rollen (manage_options) sichtbar
+
+## Geplant als nächstes
 - Fortschrittsanzeige pro Projekt / Zimmer
 - Anderes (z. B. UI-Verbesserung, Filter, Benutzerübersicht …)
 

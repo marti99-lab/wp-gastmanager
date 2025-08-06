@@ -20,6 +20,7 @@ define('WPGM_PATH', plugin_dir_path(__FILE__));
 require_once WPGM_PATH . 'includes/class-cpt-aufgabe.php';
 require_once WPGM_PATH . 'includes/class-roles.php';
 require_once WPGM_PATH . 'includes/class-rest-api.php';
+require_once WPGM_PATH . 'includes/class-csv-export.php';
 
 // Aktionen registrieren
 add_action('init', ['WPGM_CPT_Aufgabe', 'register_aufgabe_post_type']);
@@ -33,6 +34,10 @@ add_action('rest_api_init', ['WPGM_REST_API', 'register_routes']);
 add_action('add_meta_boxes', ['WPGM_CPT_Aufgabe', 'add_metaboxen']);
 // Hook für Speichern
 add_action('save_post', ['WPGM_CPT_Aufgabe', 'save_metaboxen']);
+
+// Registriert Backend-Menü und verarbeitet CSV-Export, wenn ausgelöst
+add_action('admin_menu', ['WPGM_CSV_Export', 'register_menu']);
+add_action('admin_init', ['WPGM_CSV_Export', 'maybe_export_csv']);
 
 // Benutzerrollen bei Plugin-Aktivierung registrieren
 register_activation_hook(__FILE__, ['WPGM_Role_Manager', 'register_roles']);
