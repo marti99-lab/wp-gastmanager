@@ -63,6 +63,14 @@ class WPGM_CPT_Aufgabe
             'aufgabe',
             'side'
         );
+
+        add_meta_box(
+            'wpgm_fortschritt',
+            __('Fortschritt (%)', 'wp-gastmanager'),
+            [__CLASS__, 'render_fortschritt_metabox'],
+            'aufgabe',
+            'side'
+        );
     }
 
     // Metaboxen anzeigen in HTML
@@ -95,6 +103,13 @@ class WPGM_CPT_Aufgabe
         echo '</select>';
     }
 
+    public static function render_fortschritt_metabox($post)
+    {
+        $value = get_post_meta($post->ID, '_wpgm_fortschritt', true);
+        echo '<label for="wpgm_fortschritt">' . esc_html__('Fortschritt in %', 'wp-gastmanager') . '</label><br>';
+        echo '<input type="number" id="wpgm_fortschritt" name="wpgm_fortschritt" value="' . esc_attr($value) . '" min="0" max="100" step="1" /> %';
+    }
+
     // Metadaten speichern
     public static function save_metaboxen($post_id)
     {
@@ -111,6 +126,11 @@ class WPGM_CPT_Aufgabe
 
         if (isset($_POST['wpgm_verantwortlich'])) {
             update_post_meta($post_id, '_wpgm_verantwortlich', intval($_POST['wpgm_verantwortlich']));
+        }
+
+        if (isset($_POST['wpgm_fortschritt'])) {
+            $wert = min(100, max(0, intval($_POST['wpgm_fortschritt'])));
+            update_post_meta($post_id, '_wpgm_fortschritt', $wert);
         }
     }
 
@@ -167,12 +187,14 @@ class WPGM_CPT_Aufgabe
             $zimmer = get_post_meta(get_the_ID(), '_wpgm_zimmernummer', true);
             $verantwortlich = get_post_meta(get_the_ID(), '_wpgm_verantwortlich', true);
             $user = $verantwortlich ? get_userdata($verantwortlich) : null;
+            $fortschritt = get_post_meta(get_the_ID(), '_wpgm_fortschritt', true);
 
             echo '<li>';
             echo '<strong>' . esc_html(get_the_title()) . '</strong><br>';
             echo esc_html__('Zimmer', 'wp-gastmanager') . ': ' . esc_html($zimmer) . '<br>';
             echo esc_html__('Fällig bis', 'wp-gastmanager') . ': ' . esc_html($faellig) . '<br>';
             echo esc_html__('Verantwortlich', 'wp-gastmanager') . ': ' . ($user ? esc_html($user->display_name) : '–') . '<br>';
+            echo esc_html__('Fortschritt', 'wp-gastmanager') . ': ' . esc_html($fortschritt) . '%<br>';
             echo '</li>';
         }
         echo '</ul>';

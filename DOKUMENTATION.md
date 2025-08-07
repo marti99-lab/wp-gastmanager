@@ -93,8 +93,11 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Exportiert Aufgaben (ID, Titel, Zimmer, Fälligkeit, Verantwortlicher) als CSV-Datei
 - Backend-Seite nur für berechtigte Rollen (manage_options) sichtbar
 
+### 10. Fortschrittsanzeige pro Aufgabe
+- Neue Metabox „Fortschritt (%)“ zur Eingabe im Backend (0–100 %)
+- Fortschrittswert wird im Frontend-Shortcode und REST-API ausgegeben (fortschritt)
+
 ## Geplant als nächstes
-- Fortschrittsanzeige pro Projekt / Zimmer
 - Anderes (z. B. UI-Verbesserung, Filter, Benutzerübersicht …)
 
 ---

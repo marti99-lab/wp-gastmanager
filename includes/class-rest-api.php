@@ -52,7 +52,8 @@ class WPGM_REST_API
                 'title'         => get_the_title(),
                 'zimmernummer'  => get_post_meta(get_the_ID(), '_wpgm_zimmernummer', true),
                 'faelligkeit'   => get_post_meta(get_the_ID(), '_wpgm_faelligkeit', true),
-                'verantwortlich'=> get_post_meta(get_the_ID(), '_wpgm_verantwortlich', true),
+                'verantwortlich' => get_post_meta(get_the_ID(), '_wpgm_verantwortlich', true),
+                'fortschritt' => get_post_meta(get_the_ID(), '_wpgm_fortschritt', true),
                 'link'          => get_permalink(),
             ];
         }
