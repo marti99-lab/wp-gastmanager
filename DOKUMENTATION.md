@@ -97,8 +97,16 @@ Ziel ist es, Mitarbeitern Aufgaben zuzuweisen, Fristen zu setzen und eine einfac
 - Neue Metabox „Fortschritt (%)“ zur Eingabe im Backend (0–100 %)
 - Fortschrittswert wird im Frontend-Shortcode und REST-API ausgegeben (fortschritt)
 
+### 11. Filter- und Suchfunktionen (Frontend & Backend)
+- Backend: Filter nach Verantwortlichem, Zimmernummer und Fälligkeitsdatum.
+- Frontend: Optionales Filterformular (show_filters="yes") im Shortcode.
+- Rollenbasiert: Verantwortlich-Filter nur für berechtigte Rollen sichtbar.
+
 ## Geplant als nächstes
-- Anderes (z. B. UI-Verbesserung, Filter, Benutzerübersicht …)
+- Benutzerübersicht mit Anzahl offener Aufgaben
+- UI-Verbesserung für Shortcode-Ansicht (Tabellen, Farben, Fortschrittsbalken)
+- „Erledigt“-Status mit Checkbox im Frontend
+- Import-Funktion für Aufgaben (CSV/Excel)
 
 ---
 

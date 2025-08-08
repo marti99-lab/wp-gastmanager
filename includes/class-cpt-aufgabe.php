@@ -10,27 +10,27 @@ class WPGM_CPT_Aufgabe
     public static function register_aufgabe_post_type()
     {
         $labels = [
-            'name'               => __('Aufgaben', 'wp-gastmanager'),
-            'singular_name'      => __('Aufgabe', 'wp-gastmanager'),
-            'add_new'            => __('Neue Aufgabe', 'wp-gastmanager'),
-            'add_new_item'       => __('Neue Aufgabe hinzufügen', 'wp-gastmanager'),
-            'edit_item'          => __('Aufgabe bearbeiten', 'wp-gastmanager'),
-            'new_item'           => __('Neue Aufgabe', 'wp-gastmanager'),
-            'view_item'          => __('Aufgabe ansehen', 'wp-gastmanager'),
-            'search_items'       => __('Aufgaben durchsuchen', 'wp-gastmanager'),
-            'not_found'          => __('Keine Aufgaben gefunden', 'wp-gastmanager'),
-            'menu_name'          => __('Aufgaben', 'wp-gastmanager')
+            'name' => __('Aufgaben', 'wp-gastmanager'),
+            'singular_name' => __('Aufgabe', 'wp-gastmanager'),
+            'add_new' => __('Neue Aufgabe', 'wp-gastmanager'),
+            'add_new_item' => __('Neue Aufgabe hinzufügen', 'wp-gastmanager'),
+            'edit_item' => __('Aufgabe bearbeiten', 'wp-gastmanager'),
+            'new_item' => __('Neue Aufgabe', 'wp-gastmanager'),
+            'view_item' => __('Aufgabe ansehen', 'wp-gastmanager'),
+            'search_items' => __('Aufgaben durchsuchen', 'wp-gastmanager'),
+            'not_found' => __('Keine Aufgaben gefunden', 'wp-gastmanager'),
+            'menu_name' => __('Aufgaben', 'wp-gastmanager')
         ];
 
         $args = [
-            'labels'             => $labels,
-            'public'             => true,
-            'has_archive'        => true,
-            'menu_position'      => 21,
-            'menu_icon'          => 'dashicons-clipboard',
-            'supports'           => ['title', 'editor', 'author'],
-            'rewrite'            => ['slug' => 'aufgabe'],
-            'show_in_rest'       => true
+            'labels' => $labels,
+            'public' => true,
+            'has_archive' => true,
+            'menu_position' => 21,
+            'menu_icon' => 'dashicons-clipboard',
+            'supports' => ['title', 'editor', 'author'],
+            'rewrite' => ['slug' => 'aufgabe'],
+            'show_in_rest' => true
         ];
 
         register_post_type('aufgabe', $args);
@@ -113,8 +113,10 @@ class WPGM_CPT_Aufgabe
     // Metadaten speichern
     public static function save_metaboxen($post_id)
     {
-        if (get_post_type($post_id) !== 'aufgabe') return;
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (get_post_type($post_id) !== 'aufgabe')
+            return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
+            return;
 
         if (isset($_POST['wpgm_zimmernummer'])) {
             update_post_meta($post_id, '_wpgm_zimmernummer', sanitize_text_field($_POST['wpgm_zimmernummer']));
@@ -149,29 +151,72 @@ class WPGM_CPT_Aufgabe
 
         $atts = shortcode_atts([
             'orderby' => 'meta_value',
-            'order'   => 'ASC',
-            'show'    => 'own'
+            'order' => 'ASC',
+            'show' => 'own',   // own | all (nur für berechtigte Rollen wirksam)
+            'show_filters' => 'yes',   // yes | no
         ], $atts);
 
         $wants_all = $atts['show'] === 'all' && !empty($show_all);
 
+        // Filter aus der URL ziehen
+        $filter_verantw = isset($_GET['wpgm_verantwortlich']) ? absint($_GET['wpgm_verantwortlich']) : 0;
+        $filter_zimmer = isset($_GET['wpgm_zimmernummer']) ? sanitize_text_field($_GET['wpgm_zimmernummer']) : '';
+        $filter_due = isset($_GET['wpgm_faellig_bis']) ? sanitize_text_field($_GET['wpgm_faellig_bis']) : '';
+
+        // Nur privilegierte Rollen dürfen frei nach "verantwortlich" filtern
+        if (empty($show_all)) {
+            // Nicht-privilegierte sehen immer nur ihre Aufgaben; ignorieren fremde Auswahl
+            $filter_verantw = get_current_user_id();
+        }
+
         $args = [
-            'post_type'      => 'aufgabe',
-            'post_status'    => 'publish',
+            'post_type' => 'aufgabe',
+            'post_status' => 'publish',
             'posts_per_page' => -1,
-            'meta_key'       => $atts['orderby'] === 'meta_value' ? '_wpgm_faelligkeit' : '',
-            'orderby'        => $atts['orderby'],
-            'order'          => $atts['order'],
+            'meta_key' => $atts['orderby'] === 'meta_value' ? '_wpgm_faelligkeit' : '',
+            'orderby' => $atts['orderby'],
+            'order' => $atts['order'],
         ];
 
-        if (!$wants_all) {
-            $args['meta_query'] = [
-                [
-                    'key'     => '_wpgm_verantwortlich',
-                    'value'   => get_current_user_id(),
-                    'compare' => '=',
-                ]
+        $meta_query = ['relation' => 'AND'];
+
+        // Verantwortlich-Filter (immer gesetzt: entweder ausgewählt oder erzwungen auf current_user)
+        if ($filter_verantw) {
+            $meta_query[] = [
+                'key' => '_wpgm_verantwortlich',
+                'value' => $filter_verantw,
+                'compare' => '=',
             ];
+        } elseif (!$wants_all) {
+            // Fallback für Nicht-privilegierte, falls oben nicht gesetzt
+            $meta_query[] = [
+                'key' => '_wpgm_verantwortlich',
+                'value' => get_current_user_id(),
+                'compare' => '=',
+            ];
+        }
+
+        // Zimmernummer (Teiltreffer sinnvoll)
+        if ($filter_zimmer !== '') {
+            $meta_query[] = [
+                'key' => '_wpgm_zimmernummer',
+                'value' => $filter_zimmer,
+                'compare' => 'LIKE',
+            ];
+        }
+
+        // Fällig bis (<= Datum)
+        if ($filter_due !== '') {
+            $meta_query[] = [
+                'key' => '_wpgm_faelligkeit',
+                'value' => $filter_due,
+                'compare' => '<=',
+                'type' => 'DATE',
+            ];
+        }
+
+        if (count($meta_query) > 1 || !empty($meta_query[0])) {
+            $args['meta_query'] = $meta_query;
         }
 
         $query = new WP_Query($args);
@@ -180,6 +225,50 @@ class WPGM_CPT_Aufgabe
         }
 
         ob_start();
+
+        if ($atts['show_filters'] === 'yes') {
+            // Nur privilegierte Rollen: Dropdown für Verantwortliche
+            $users = [];
+            if (!empty($show_all)) {
+                $users = get_users(['role__in' => ['administrator', 'editor', 'author', 'manager', 'mitarbeiter', 'hausdame', 'technik']]);
+            }
+
+            echo '<form method="get" class="wpgm-filter-form">';
+            // Zimmer
+            echo '<label>' . esc_html__('Zimmernummer', 'wp-gastmanager') . ': ';
+            echo '<input type="text" name="wpgm_zimmernummer" value="' . esc_attr($filter_zimmer) . '"></label> ';
+            // Fällig bis
+            echo '<label>' . esc_html__('Fällig bis', 'wp-gastmanager') . ': ';
+            echo '<input type="date" name="wpgm_faellig_bis" value="' . esc_attr($filter_due) . '"></label> ';
+
+            // Verantwortlich nur für privilegierte
+            if (!empty($show_all)) {
+                echo '<label>' . esc_html__('Verantwortlich', 'wp-gastmanager') . ': ';
+                echo '<select name="wpgm_verantwortlich">';
+                echo '<option value="0">' . esc_html__('– alle –', 'wp-gastmanager') . '</option>';
+                foreach ($users as $u) {
+                    printf(
+                        '<option value="%d"%s>%s</option>',
+                        $u->ID,
+                        selected($filter_verantw, $u->ID, false),
+                        esc_html($u->display_name)
+                    );
+                }
+                echo '</select></label> ';
+            } else {
+                // Nicht-privilegierte: verstecktes Feld auf eigenen User fixieren
+                echo '<input type="hidden" name="wpgm_verantwortlich" value="' . esc_attr(get_current_user_id()) . '">';
+            }
+
+            // show-Param mitnehmen (falls Admin Seite mit show=all nutzt)
+            if ($wants_all) {
+                echo '<input type="hidden" name="show" value="all">';
+            }
+
+            echo '<button type="submit">' . esc_html__('Filter anwenden', 'wp-gastmanager') . '</button>';
+            echo '</form><br>';
+        }
+
         echo '<ul class="wpgm-aufgabenliste">';
         while ($query->have_posts()) {
             $query->the_post();

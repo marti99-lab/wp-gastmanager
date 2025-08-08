@@ -21,6 +21,11 @@ require_once WPGM_PATH . 'includes/class-cpt-aufgabe.php';
 require_once WPGM_PATH . 'includes/class-roles.php';
 require_once WPGM_PATH . 'includes/class-rest-api.php';
 require_once WPGM_PATH . 'includes/class-csv-export.php';
+require_once WPGM_PATH . 'includes/class-admin-filters.php';
+
+// Diese Hooks sorgen dafür, dass die Filter im Admin-Bereich angezeigt werden und die Abfrage entsprechend angepasst wird
+add_action('restrict_manage_posts', ['WPGM_Admin_Filters', 'render_filters']);
+add_action('pre_get_posts',        ['WPGM_Admin_Filters', 'filter_query']);
 
 // Aktionen registrieren
 add_action('init', ['WPGM_CPT_Aufgabe', 'register_aufgabe_post_type']);
