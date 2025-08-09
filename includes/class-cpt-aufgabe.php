@@ -76,6 +76,7 @@ class WPGM_CPT_Aufgabe
     // Metaboxen anzeigen in HTML
     public static function render_zimmernummer_metabox($post)
     {
+        wp_nonce_field('wpgm_save_meta', 'wpgm_meta_nonce');
         $value = get_post_meta($post->ID, '_wpgm_zimmernummer', true);
         echo '<label for="wpgm_zimmernummer">' . esc_html__('Zimmernummer:', 'wp-gastmanager') . '</label><br>';
         echo '<input type="text" id="wpgm_zimmernummer" name="wpgm_zimmernummer" value="' . esc_attr($value) . '" />';
@@ -91,8 +92,7 @@ class WPGM_CPT_Aufgabe
     public static function render_verantwortlich_metabox($post)
     {
         $value = get_post_meta($post->ID, '_wpgm_verantwortlich', true);
-        $users = get_users(['role__in' => ['author', 'editor', 'administrator']]);
-
+        $users = get_users(['role__in' => ['administrator','editor','author','manager','mitarbeiter','hausdame','technik']]);
         echo '<label for="wpgm_verantwortlich">' . esc_html__('Verantwortlich:', 'wp-gastmanager') . '</label><br>';
         echo '<select id="wpgm_verantwortlich" name="wpgm_verantwortlich">';
         echo '<option value="">' . esc_html__('– auswählen –', 'wp-gastmanager') . '</option>';
@@ -113,28 +113,45 @@ class WPGM_CPT_Aufgabe
     // Metadaten speichern
     public static function save_metaboxen($post_id)
     {
-        if (get_post_type($post_id) !== 'aufgabe')
+        if (get_post_type($post_id) !== 'aufgabe') return;
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+        if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) return;
+    
+        if (!isset($_POST['wpgm_meta_nonce']) || !wp_verify_nonce($_POST['wpgm_meta_nonce'], 'wpgm_save_meta')) {
             return;
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
-            return;
-
+        }
+    
+        if (!current_user_can('edit_post', $post_id)) return;
+    
         if (isset($_POST['wpgm_zimmernummer'])) {
-            update_post_meta($post_id, '_wpgm_zimmernummer', sanitize_text_field($_POST['wpgm_zimmernummer']));
+            update_post_meta(
+                $post_id,
+                '_wpgm_zimmernummer',
+                sanitize_text_field(wp_unslash($_POST['wpgm_zimmernummer']))
+            );
         }
-
+    
         if (isset($_POST['wpgm_faelligkeit'])) {
-            update_post_meta($post_id, '_wpgm_faelligkeit', sanitize_text_field($_POST['wpgm_faelligkeit']));
+            $date = sanitize_text_field(wp_unslash($_POST['wpgm_faelligkeit']));
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                update_post_meta($post_id, '_wpgm_faelligkeit', $date);
+            }
         }
-
+    
         if (isset($_POST['wpgm_verantwortlich'])) {
-            update_post_meta($post_id, '_wpgm_verantwortlich', intval($_POST['wpgm_verantwortlich']));
+            update_post_meta(
+                $post_id,
+                '_wpgm_verantwortlich',
+                (int) $_POST['wpgm_verantwortlich']
+            );
         }
-
+    
         if (isset($_POST['wpgm_fortschritt'])) {
-            $wert = min(100, max(0, intval($_POST['wpgm_fortschritt'])));
+            $wert = (int) $_POST['wpgm_fortschritt'];
+            $wert = max(0, min(100, $wert));
             update_post_meta($post_id, '_wpgm_fortschritt', $wert);
         }
-    }
+    }    
 
     // Shortcode registrieren
     public static function register_shortcode()
@@ -178,46 +195,50 @@ class WPGM_CPT_Aufgabe
             'order' => $atts['order'],
         ];
 
-        $meta_query = ['relation' => 'AND'];
+        $mq = [];
 
-        // Verantwortlich-Filter (immer gesetzt: entweder ausgewählt oder erzwungen auf current_user)
+        // Verantwortlich-Filter
         if ($filter_verantw) {
-            $meta_query[] = [
-                'key' => '_wpgm_verantwortlich',
-                'value' => $filter_verantw,
+            $mq[] = [
+                'key'     => '_wpgm_verantwortlich',
+                'value'   => $filter_verantw,
                 'compare' => '=',
             ];
         } elseif (!$wants_all) {
-            // Fallback für Nicht-privilegierte, falls oben nicht gesetzt
-            $meta_query[] = [
-                'key' => '_wpgm_verantwortlich',
-                'value' => get_current_user_id(),
+            $mq[] = [
+                'key'     => '_wpgm_verantwortlich',
+                'value'   => get_current_user_id(),
                 'compare' => '=',
             ];
         }
-
+        
         // Zimmernummer (Teiltreffer sinnvoll)
         if ($filter_zimmer !== '') {
-            $meta_query[] = [
-                'key' => '_wpgm_zimmernummer',
-                'value' => $filter_zimmer,
+            $mq[] = [
+                'key'     => '_wpgm_zimmernummer',
+                'value'   => $filter_zimmer,
                 'compare' => 'LIKE',
             ];
         }
-
+        
         // Fällig bis (<= Datum)
         if ($filter_due !== '') {
-            $meta_query[] = [
-                'key' => '_wpgm_faelligkeit',
-                'value' => $filter_due,
+            $mq[] = [
+                'key'     => '_wpgm_faelligkeit',
+                'value'   => $filter_due,
                 'compare' => '<=',
-                'type' => 'DATE',
+                'type'    => 'DATE',
             ];
         }
-
-        if (count($meta_query) > 1 || !empty($meta_query[0])) {
-            $args['meta_query'] = $meta_query;
+        
+        // Nur setzen, wenn mindestens eine Bedingung vorhanden ist
+        if (!empty($mq)) {
+            if (count($mq) > 1) {
+                $mq['relation'] = 'AND';
+            }
+            $args['meta_query'] = $mq;
         }
+        
 
         $query = new WP_Query($args);
         if (!$query->have_posts()) {
