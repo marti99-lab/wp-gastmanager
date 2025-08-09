@@ -23,6 +23,11 @@ require_once WPGM_PATH . 'includes/class-rest-api.php';
 require_once WPGM_PATH . 'includes/class-csv-export.php';
 require_once WPGM_PATH . 'includes/class-admin-filters.php';
 
+// Übersetzungen laden
+add_action('plugins_loaded', function () {
+    load_plugin_textdomain('wp-gastmanager', false, dirname(plugin_basename(__FILE__)) . '/languages');
+});
+
 // Diese Hooks sorgen dafür, dass die Filter im Admin-Bereich angezeigt werden und die Abfrage entsprechend angepasst wird
 add_action('restrict_manage_posts', ['WPGM_Admin_Filters', 'render_filters']);
 add_action('pre_get_posts',        ['WPGM_Admin_Filters', 'filter_query']);
@@ -44,10 +49,19 @@ add_action('save_post', ['WPGM_CPT_Aufgabe', 'save_metaboxen']);
 add_action('admin_menu', ['WPGM_CSV_Export', 'register_menu']);
 add_action('admin_init', ['WPGM_CSV_Export', 'maybe_export_csv']);
 
-// Benutzerrollen bei Plugin-Aktivierung registrieren
-register_activation_hook(__FILE__, ['WPGM_Role_Manager', 'register_roles']);
-// Rollen bei Deaktivierung entfernen
-register_deactivation_hook(__FILE__, ['WPGM_Role_Manager', 'remove_roles']);
+// Bei Aktivierung: Rollen registrieren, CPT registrieren, Permalinks aktualisieren
+register_activation_hook(__FILE__, function () {
+    WPGM_Role_Manager::register_roles();
+    WPGM_CPT_Aufgabe::register_aufgabe_post_type();
+    flush_rewrite_rules();
+});
+
+// Bei Deaktivierung: Rollen entfernen (optional) und Permalinks aktualisieren
+register_deactivation_hook(__FILE__, function () {
+    WPGM_Role_Manager::remove_roles();
+    flush_rewrite_rules();
+});
+
 
 
 
