@@ -187,13 +187,17 @@ class WPGM_CPT_Aufgabe
         }
 
         $args = [
-            'post_type' => 'aufgabe',
-            'post_status' => 'publish',
+            'post_type'      => 'aufgabe',
+            'post_status'    => 'publish',
             'posts_per_page' => -1,
-            'meta_key' => $atts['orderby'] === 'meta_value' ? '_wpgm_faelligkeit' : '',
-            'orderby' => $atts['orderby'],
-            'order' => $atts['order'],
+            'orderby'        => $atts['orderby'],
+            'order'          => $atts['order'],
         ];
+        
+        // meta_key nur setzen, wenn wirklich nach Meta sortiert wird
+        if ($atts['orderby'] === 'meta_value') {
+            $args['meta_key'] = '_wpgm_faelligkeit';
+        }        
 
         $mq = [];
 
