@@ -1,6 +1,5 @@
 <?php
 // includes/class-roles.php
-
 defined('ABSPATH') || exit;
 
 class WPGM_Role_Manager
@@ -19,6 +18,14 @@ class WPGM_Role_Manager
         add_role('technik', __('Technik', 'wp-gastmanager'), [
             'read' => true,
         ]);
+
+        // Manager
+        add_role('manager', __('Manager', 'wp-gastmanager'), [
+            'read' => true,
+            'edit_posts' => true,
+            'publish_posts' => true,
+            'delete_posts' => true,
+        ]);
     }
 
     // Rollen bei Deaktivierung entfernen (optional)
@@ -27,5 +34,6 @@ class WPGM_Role_Manager
         remove_role('mitarbeiter');
         remove_role('hausdame');
         remove_role('technik');
+        remove_role('manager'); // NEU
     }
 }
